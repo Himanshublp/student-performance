@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Chatbot for College Students</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #chat-container {
+      width: 100%;
+      max-width: 480px;
+      height: 650px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    h1 {
+      padding: 20px;
+      background: #4a90e2;
+      color: white;
+      font-size: 1.5rem;
+      text-align: center;
+      margin: 0;
+    }
+
+    #professional-select-container {
+      padding: 12px 20px;
+      background: #f0f4ff;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    select {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    select:hover, select:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+
+    #quick-tip {
+      background: #e0f0ff;
+      color: #03396c;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      border-left: 5px solid #4a90e2;
+      font-weight: 600;
+      display: none;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f9f9fb;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-end;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .message.bot {
+      justify-content: flex-start;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin: 0 8px;
+      user-select: none;
+    }
+
+    .bubble {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .message.bot .bubble {
+      background: #e5e5ea;
+      color: #2c2c2c;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user .bubble {
+      background: #4a90e2;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    form {
+      display: flex;
+      padding: 15px 20px;
+      background: #fafafa;
+      gap: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      padding: 12px 16px;
+      border-radius: 25px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      min-height: 40px;
+      font-family: inherit;
+    }
+
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 0 16px;
+      height: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background: #3b78d8;
+    }
+
+    #voice-btn {
+      background: #fff;
+      border: 2px solid #4a90e2;
+      color: #4a90e2;
+      font-size: 1.2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      line-height: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+    }
+
+    #voice-btn.active {
+      background: #4a90e2;
+      color: #fff;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat-container">
+  <h1>Chat with AI 🤖</h1>
+
+  <div id="professional-select-container">
+    <label for="professional-select">Choose who to chat with:</label>
+    <select id="professional-select" aria-label="Select professional to chat">
+      <option value="teacher" selected>Teacher</option>
+      <option value="counselor">Counselor</option>
+      <option value="friend">Friend</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+
+  <!-- Quick tips for college students -->
+  <div id="quick-tip" role="region" aria-live="polite"></div>
+
+  <div id="messages"></div>
+
+  <form id="input-form">
+    <button type="button" id="voice-btn" title="Toggle voice">🎤</button>
+    <textarea id="input-message" placeholder="Type your message..." rows="1" autocomplete="off" required></textarea>
+    <button type="submit" aria-label="Send message">➡️</button>
+  </form>
+</div>
+
+<script>
+  const inputForm = document.getElementById('input-form');
+  const inputMessage = document.getElementById('input-message');
+  const messagesEl = document.getElementById('messages');
+  const voiceBtn = document.getElementById('voice-btn');
+  const professionalSelect = document.getElementById('professional-select');
+  const quickTipEl = document.getElementById('quick-tip');
+
+  const userAvatar = 'https://i.pravatar.cc/40?img=5';
+  const botAvatar = 'https://robohash.org/chatbot.png?size=40x40';
+
+  // Store chat histories for each professional separately
+  const chatHistories = {
+    teacher: [],
+    counselor: [],
+    friend: [],
+    other: [],
+  };
+
+  // College student tips mapped to professionals
+  const quickTips = {
+    teacher: "💡 Study Tip: Break your study sessions into focused 25-minute intervals with 5-minute breaks (Pomodoro Technique).",
+    counselor: "🌿 Mental Health Tip: Remember to take deep breaths and reach out if you feel overwhelmed. Your campus counseling center is here to help!",
+  };
+
+  // Escape HTML to prevent injection (if needed in future)
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render messages of the currently selected professional
+  function renderMessages(professional) {
+    messagesEl.innerHTML = '';
+    const history = chatHistories[professional] || [];
+    for (const msg of history) {
+      addMessage(msg.text, msg.sender, false);
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    // Show or hide quick tip based on selected professional
+    if (quickTips[professional]) {
+      quickTipEl.textContent = quickTips[professional];
+      quickTipEl.style.display = 'block';
+    } else {
+      quickTipEl.textContent = '';
+      quickTipEl.style.display = 'none';
+    }
+  }
+
+  // Add message to UI and optionally save it to history
+  function addMessage(text, sender, saveToHistory = true) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `message ${sender}`;
+
+    const avatar = document.createElement('img');
+    avatar.src = sender === 'user' ? userAvatar : botAvatar;
+    avatar.className = 'avatar';
+    avatar.alt = sender === 'user' ? 'User avatar' : 'Bot avatar';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    if (sender === 'user') {
+      wrapper.append(bubble, avatar);
+    } else {
+      wrapper.append(avatar, bubble);
+    }
+
+    messagesEl.appendChild(wrapper);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    if (saveToHistory) {
+      const professional = professionalSelect.value;
+      chatHistories[professional].push({ text, sender });
+    }
+  }
+
+  async function sendMessage(message) {
+    const professional = professionalSelect.value;
+    addMessage(message, 'user');  // Add user message
+
+    inputMessage.value = '';
+    inputMessage.disabled = true;
+
+    try {
+      // Send professional info along with message to backend
+      const response = await fetch('/api/chat/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, professional }),
+      });
+
+      const data = await response.json();
+      const reply = data.reply || "No response from AI.";
+      addMessage(reply, 'bot');  // Add bot reply
+
+      // Voice output
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(reply);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    } catch (err) {
+      addMessage("Error: Unable to get response.", 'bot');
+    } finally {
+      inputMessage.disabled = false;
+      inputMessage.focus();
+    }
+  }
+
+  inputForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = inputMessage.value.trim();
+    if (!message) return;
+    sendMessage(message);
+  });
+
+  // Voice recognition (Speech-to-Text)
+  let recognition;
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.addEventListener('result', (e) => {
+      const transcript = e.results[0][0].transcript;
+      inputMessage.value = transcript;
+      inputMessage.focus();
+    });
+
+    recognition.addEventListener('end', () => {
+      voiceBtn.classList.remove('active');
+    });
+  } else {
+    voiceBtn.disabled = true;
+    voiceBtn.title = 'Speech recognition not supported';
+  }
+
+  voiceBtn.addEventListener('click', () => {
+    if (!recognition) return;
+    if (voiceBtn.classList.contains('active')) {
+      recognition.stop();
+      voiceBtn.classList.remove('active');
+    } else {
+      recognition.start();
+      voiceBtn.classList.add('active');
+    }
+  });
+
+  // When professional selection changes, render corresponding chat history and quick tip
+  professionalSelect.addEventListener('change', () => {
+    renderMessages(professionalSelect.value);
+    inputMessage.focus();
+  });
+
+  // Initialize with teacher selected
+  renderMessages(professionalSelect.value);
+  inputMessage.focus();
+
+</script>
+</body>
+</html>

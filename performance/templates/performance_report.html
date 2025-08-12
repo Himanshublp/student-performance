@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f3a683 0%, #f7b731 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin-top: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: slideIn 1s ease-out;
+        }
+
+        .chart-container {
+            width: 100%;
+            margin-bottom: 40px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .performance-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: #f1f1f1;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            margin: 0 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            font-size: 18px;
+        }
+
+        .weak-subjects {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .radar-chart-container, .pie-chart-container, .line-chart-container, .comparison-charts {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .radar-chart-container canvas, .pie-chart-container canvas, .line-chart-container canvas, .comparison-charts canvas {
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .radar-chart-container, .pie-chart-container, .line-chart-container, .comparison-charts {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Performance Dashboard</h1>
+
+    <div class="container">
+        <!-- Performance Chart -->
+        <div class="chart-container">
+            <canvas id="performanceChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Radar Chart for Subject-wise Performance -->
+        <div class="radar-chart-container">
+            <canvas id="radarChart" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Pie Chart for Score Distribution -->
+        <div class="pie-chart-container">
+            <canvas id="pieChart" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Line Chart for Performance over Time -->
+        <div class="line-chart-container">
+            <canvas id="lineChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Comparison Charts -->
+        <div class="comparison-charts">
+            <!-- Grouped Bar Chart -->
+            <div class="chart-container">
+                <canvas id="groupedBarChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Stacked Bar Chart -->
+            <div class="chart-container">
+                <canvas id="stackedBarChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Scatter Plot -->
+            <div class="chart-container">
+                <canvas id="scatterPlot" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Performance Summary -->
+        <div class="performance-summary">
+            <div class="summary-card">
+                <h3>Average Score</h3>
+                <p>85%</p>
+            </div>
+            <div class="summary-card">
+                <h3>Top Subject</h3>
+                <p>Mathematics</p>
+            </div>
+            <div class="summary-card">
+                <h3>Weak Subject</h3>
+                <p>Chemistry</p>
+            </div>
+        </div>
+
+        <!-- Weak Subjects -->
+        <div class="weak-subjects">
+            <h2>Weak Subjects</h2>
+            <ul>
+                <li><strong>Physics</strong> - Score: 60%</li>
+                <li><strong>Chemistry</strong> - Score: 55%</li>
+            </ul>
+
+            <h3>Suggested Resources:</h3>
+            <ul>
+                <li><strong>Physics:</strong>
+                    <ul>
+                        <li><a href="https://www.khanacademy.org/science/physics" target="_blank">Khan Academy - Physics</a></li>
+                        <li><a href="https://www.youtube.com/user/MinutePhysics" target="_blank">MinutePhysics (YouTube)</a></li>
+                        <li><a href="https://www.youtube.com/c/PhysicsGirl" target="_blank">Physics Girl (YouTube)</a></li>
+                        <li>Book: *Concepts of Physics* by H.C. Verma</li>
+                    </ul>
+                </li>
+                <li><strong>Chemistry:</strong>
+                    <ul>
+                        <li><a href="https://www.khanacademy.org/science/chemistry" target="_blank">Khan Academy - Chemistry</a></li>
+                        <li><a href="https://www.youtube.com/playlist?list=PL8dPuuaLjXtOalIu6zQ_Gs63_TG5m0GZY" target="_blank">CrashCourse Chemistry (YouTube)</a></li>
+                        <li>Book: *Chemistry: The Central Science* by Brown, LeMay, and Bursten</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        const groupedBarCtx = document.getElementById('groupedBarChart').getContext('2d');
+        const stackedBarCtx = document.getElementById('stackedBarChart').getContext('2d');
+        const scatterCtx = document.getElementById('scatterPlot').getContext('2d');
+
+        // Sample Data
+        const performanceData = [85, 90, 70, 80, 60];
+        const performanceLabels = ['Exam 1', 'Exam 2', 'Exam 3', 'Exam 4', 'Exam 5'];
+        const subjectScores = [85, 90, 70, 80, 60];
+        const subjectNames = ['Math', 'Science', 'English', 'History', 'Chemistry'];
+        const timeLabels = ['January', 'February', 'March', 'April', 'May'];
+        const timeScores = [80, 85, 88, 90, 92];
+
+        // Grouped Bar Chart (Compare Scores by Subject)
+        new Chart(groupedBarCtx, {
+            type: 'bar',
+            data: {
+                labels: subjectNames,
+                datasets: [{
+                    label: 'Exam 1',
+                    data: [80, 85, 70, 75, 60],
+                    backgroundColor: '#ff6384'
+                }, {
+                    label: 'Exam 2',
+                    data: [85, 90, 75, 80, 65],
+                    backgroundColor: '#36a2eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Stacked Bar Chart (Compare Scores by Subject)
+        new Chart(stackedBarCtx, {
+            type: 'bar',
+            data: {
+                labels: subjectNames,
+                datasets: [{
+                    label: 'Exam 1',
+                    data: [80, 85, 70, 75, 60],
+                    backgroundColor: '#ff6384'
+                }, {
+                    label: 'Exam 2',
+                    data: [85, 90, 75, 80, 65],
+                    backgroundColor: '#36a2eb'
+                }, {
+                    label: 'Exam 3',
+                    data: [75, 80, 70, 70, 60],
+                    backgroundColor: '#cc65fe'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        align: 'top',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        }
+                    }
+                }
+            }
+        });
+
+        // Scatter Plot (Study Hours vs Exam Scores)
+        new Chart(scatterCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Study Hours vs Scores',
+                    data: [{
+                        x: 5, y: 75
+                    }, {
+                        x: 10, y: 80
+                    }, {
+                        x: 15, y: 85
+                    }, {
+                        x: 20, y: 90
+                    }],
+                    backgroundColor: '#36a2eb',
+                    borderColor: '#36a2eb',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Study Hours'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Exam Scores'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bar Chart (Performance Chart)
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: performanceLabels,
+                datasets: [{
+                    label: 'Scores',
+                    data: performanceData,
+                    backgroundColor: 'rgba(66, 165, 245, 0.6)',
+                    borderColor: 'rgba(66, 165, 245, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        align: 'top',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        }
+                    }
+                }
+            }
+        });
+
+        // Radar Chart (Subject-wise Performance)
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: subjectNames,
+                datasets: [{
+                    label: 'Subject Performance',
+                    data: subjectScores,
+                    backgroundColor: 'rgba(66, 165, 245, 0.4)',
+                    borderColor: 'rgba(66, 165, 245, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scale: {
+                    ticks: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Pie Chart (Score Distribution)
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: subjectNames,
+                datasets: [{
+                    data: subjectScores,
+                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4caf50'],
+                    hoverBackgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4caf50']
+                }]
+            }
+        });
+
+        // Line Chart (Performance over Time)
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [{
+                    label: 'Performance over Time',
+                    data: timeScores,
+                    fill: false,
+                    borderColor: 'rgba(66, 165, 245, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

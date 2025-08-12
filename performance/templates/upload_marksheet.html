@@ -1,0 +1,16 @@
+<!-- performance/templates/upload_marksheet.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Marksheet</title>
+</head>
+<body>
+    <h2>Upload Your Marksheet</h2>
+    <form action="{% url 'upload_marksheet' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="marksheet" accept=".pdf,.jpg,.jpeg,.png" required>
+        <button type="submit">Upload Marksheet</button>
+    </form>
+</body>
+</html>

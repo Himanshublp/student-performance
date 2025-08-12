@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 40px;
+    }
+    .section {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin: 30px auto;
+      max-width: 960px;
+    }
+    .section h2 {
+      margin-bottom: 20px;
+      color: #1e3d59;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    input, textarea, select, button {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 48%;
+    }
+    select {
+      background-color: white;
+    }
+    textarea {
+      resize: vertical;
+      height: 60px;
+      width: 100%;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s ease;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+    }
+    li {
+      background: #ecf0f1;
+      padding: 20px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      position: relative;
+      word-wrap: break-word;
+    }
+    .actions {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+    }
+    .actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #2980b9;
+      margin-left: 10px;
+    }
+    .actions button:hover {
+      text-decoration: underline;
+    }
+    strong {
+      color: #2c3e50;
+    }
+    a {
+      color: #2980b9;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .section {
+  margin-bottom: 2em;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.section h2 {
+  margin-bottom: 0.5em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.section form input,
+.section form textarea,
+.section form select {
+  display: block;
+  margin: 0.3em 0;
+  padding: 0.5em;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  font-size: 1em;
+}
+.section form button {
+  margin-top: 0.5em;
+  padding: 0.5em 1em;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.section form button:hover {
+  background-color: #45a049;
+}
+.section ul {
+  margin-top: 1em;
+  list-style-type: none;
+  padding-left: 0;
+}
+.section ul li {
+  margin-bottom: 0.8em;
+  background: white;
+  padding: 0.6em;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  position: relative;
+}
+.actions {
+  margin-top: 0.5em;
+}
+.actions button {
+  margin-right: 0.5em;
+  padding: 0.3em 0.6em;
+  font-size: 0.9em;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #888;
+  background-color: #eee;
+}
+.actions button:hover {
+  background-color: #ddd;
+}
+
+  </style>
+</head>
+<body>
+
+<h1>📚 Student Dashboard</h1>
+
+<div class="section">
+  <h2>🧠 Projects</h2>
+  <form id="projectForm" enctype="multipart/form-data">
+    <input type="text" id="projectTitle" placeholder="Project Title" required />
+    <input type="text" id="projectDescription" placeholder="Project Description" required />
+    <input type="text" id="projectTech" placeholder="Technologies Used" />
+    <input type="text" id="projectDuration" placeholder="Duration (e.g. 3 months)" />
+    <input type="text" id="projectRole" placeholder="Your Role" />
+    <input type="text" id="projectTeamSize" placeholder="Team Size" />
+    <select id="projectType">
+      <option value="" disabled selected>Project Type</option>
+      <option value="Major">Major</option>
+      <option value="Minor">Minor</option>
+    </select>
+    <select id="projectStatus">
+      <option value="" disabled selected>Status</option>
+      <option value="Completed">Completed</option>
+      <option value="Ongoing">Ongoing</option>
+      <option value="Planned">Planned</option>
+    </select>
+    <input type="text" id="projectGrade" placeholder="Grade / Score" />
+    <input type="url" id="projectLink" placeholder="Project Link" />
+    <input type="url" id="projectPdfLink" placeholder="Project PDF Link (optional)" />
+    <button type="submit">Add Project</button>
+  </form>
+  <ul id="projectList"></ul>
+</div>
+
+<div class="section">
+  <h2>🏅 Certificates</h2>
+  <form id="certificateForm" enctype="multipart/form-data">
+    <input type="text" id="certificateTitle" placeholder="Certificate Title" required />
+    <input type="text" id="certificateIssuer" placeholder="Issued By" required />
+    <input type="date" id="certificateDate" required />
+    <input type="date" id="certificateExpiryDate" placeholder="Expiry Date (optional)" />
+    <textarea id="certificateDescription" placeholder="Brief Description"></textarea>
+    <input type="text" id="certificateId" placeholder="Certificate ID" />
+    <input type="text" id="certificateType" placeholder="Type (Course/Competition)" />
+    <input type="text" id="certificateLevel" placeholder="Level (National/State)" />
+    <select id="certificateVerified">
+      <option value="" disabled selected>Verified?</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+    <input type="url" id="certificateLink" placeholder="Certificate Link" />
+    <input type="url" id="certificatePdfLink" placeholder="Certificate PDF Link (optional)" />
+    <button type="submit">Add Certificate</button>
+  </form>
+  <ul id="certificateList"></ul>
+</div>
+
+<div class="section">
+  <h2>📘 Competitive Exams</h2>
+  <form id="examForm" enctype="multipart/form-data">
+    <input type="text" id="examName" placeholder="Exam Name" required />
+    <input type="date" id="examDate" required />
+    <input type="text" id="examScore" placeholder="Score or Rank" />
+    <input type="number" id="examPercentile" placeholder="Percentile" min="0" max="100" step="0.01" />
+    <input type="number" id="examAttempt" placeholder="Attempt Number" min="1" />
+    <textarea id="examDescription" placeholder="Brief Description"></textarea>
+    <input type="text" id="examType" placeholder="Exam Type (JEE/GATE/etc)" />
+    <input type="text" id="examSubject" placeholder="Main Subject" />
+    <input type="text" id="examMode" placeholder="Mode (Online/Offline)" />
+    <input type="text" id="examOrg" placeholder="Conducted By" />
+    <input type="text" id="examLocation" placeholder="Exam Location" />
+    <input type="url" id="examPdfLink" placeholder="Scorecard PDF Link (optional)" />
+    <button type="submit">Add Exam</button>
+  </form>
+  <ul id="examList"></ul>
+</div>
+<!-- Internships -->
+<div class="section">
+  <h2>💼 Internships</h2>
+  <form id="internshipForm">
+    <input type="text" id="companyName" placeholder="Company Name" required />
+    <input type="text" id="internRole" placeholder="Role / Position" required />
+    <input type="text" id="internDuration" placeholder="Duration (e.g. 3 months)" />
+    <input type="text" id="internLocation" placeholder="Location" />
+    <input type="text" id="internStipend" placeholder="Stipend (if any)" />
+    <textarea id="internDescription" placeholder="Description / Responsibilities"></textarea>
+    <input type="url" id="internCertLink" placeholder="Internship Certificate Link / PDF" />
+    <button type="submit">Add Internship</button>
+  </form>
+  <ul id="internshipList"></ul>
+</div>
+
+<!-- Workshops / Seminars / Webinars -->
+<div class="section">
+  <h2>🎤 Workshops / Seminars / Webinars</h2>
+  <form id="workshopForm">
+    <input type="text" id="workshopTitle" placeholder="Title" required />
+    <input type="text" id="workshopOrganizer" placeholder="Organizer" />
+    <input type="date" id="workshopDate" />
+    <input type="text" id="workshopDuration" placeholder="Duration" />
+    <select id="workshopMode">
+      <option value="" disabled selected>Mode</option>
+      <option value="Online">Online</option>
+      <option value="Offline">Offline</option>
+    </select>
+    <textarea id="workshopDescription" placeholder="Description"></textarea>
+    <input type="url" id="workshopCertLink" placeholder="Certificate Link (optional)" />
+    <button type="submit">Add Workshop</button>
+  </form>
+  <ul id="workshopList"></ul>
+</div>
+
+<!-- Skills -->
+<div class="section">
+  <h2>🛠 Skills</h2>
+  <form id="skillForm">
+    <input type="text" id="skillName" placeholder="Skill Name" required />
+    <select id="skillLevel" required>
+      <option value="" disabled selected>Proficiency Level</option>
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+    <input type="number" id="skillExperience" placeholder="Years of Experience" min="0" step="0.1" />
+    <input type="text" id="skillTech" placeholder="Related Technologies or Tools" />
+    <button type="submit">Add Skill</button>
+  </form>
+  <ul id="skillList"></ul>
+</div>
+
+<!-- Extracurricular Activities -->
+<div class="section">
+  <h2>🏅 Extracurricular Activities</h2>
+  <form id="activityForm">
+    <input type="text" id="activityName" placeholder="Activity Name" required />
+    <select id="activityRole" required>
+      <option value="" disabled selected>Role</option>
+      <option value="Leader">Leader</option>
+      <option value="Member">Member</option>
+      <option value="Organizer">Organizer</option>
+    </select>
+    <textarea id="activityDescription" placeholder="Description"></textarea>
+    <input type="text" id="activityDuration" placeholder="Duration" />
+    <button type="submit">Add Activity</button>
+  </form>
+  <ul id="activityList"></ul>
+</div>
+
+<!-- Achievements / Awards -->
+<div class="section">
+  <h2>🏆 Achievements / Awards</h2>
+  <form id="achievementForm">
+    <input type="text" id="awardTitle" placeholder="Title of Award" required />
+    <input type="text" id="awardIssuer" placeholder="Issuer / Organization" />
+    <input type="date" id="awardDate" />
+    <textarea id="awardDescription" placeholder="Description"></textarea>
+    <button type="submit">Add Award</button>
+  </form>
+  <ul id="awardList"></ul>
+</div>
+
+<!-- Publications -->
+<div class="section">
+  <h2>📚 Publications</h2>
+  <form id="publicationForm">
+    <input type="text" id="pubTitle" placeholder="Title" required />
+    <input type="text" id="pubJournal" placeholder="Journal / Conference Name" />
+    <input type="date" id="pubDate" />
+    <input type="url" id="pubLink" placeholder="Link / DOI" />
+    <textarea id="pubSummary" placeholder="Summary"></textarea>
+    <button type="submit">Add Publication</button>
+  </form>
+  <ul id="publicationList"></ul>
+</div>
+
+<!-- Volunteer Experience -->
+<div class="section">
+  <h2>🤝 Volunteer Experience</h2>
+  <form id="volunteerForm">
+    <input type="text" id="volOrg" placeholder="Organization" required />
+    <input type="text" id="volRole" placeholder="Role" />
+    <input type="text" id="volDuration" placeholder="Duration" />
+    <textarea id="volDescription" placeholder="Description"></textarea>
+    <button type="submit">Add Volunteer Experience</button>
+  </form>
+  <ul id="volunteerList"></ul>
+</div>
+
+<!-- Hobbies & Interests -->
+<div class="section">
+  <h2>🎨 Hobbies & Interests</h2>
+  <form id="hobbiesForm">
+    <textarea id="hobbiesList" placeholder="List your hobbies and interests separated by commas" required></textarea>
+    <button type="submit">Add Hobbies & Interests</button>
+  </form>
+  <ul id="hobbiesListDisplay"></ul>
+</div>
+
+
+<script>
+  function getData(key) {
+    return JSON.parse(localStorage.getItem(key)) || [];
+  }
+
+  function setData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  function renderList(key, listId, formatter, fields) {
+    const data = getData(key);
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+
+    data.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = formatter(item);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => {
+        data.splice(index, 1);
+        setData(key, data);
+        renderList(key, listId, formatter, fields);
+      };
+      actions.appendChild(delBtn);
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.onclick = () => {
+        fields.forEach(f => {
+          const el = document.getElementById(f);
+          if (el) el.value = item[f] || '';
+        });
+        data.splice(index, 1);
+        setData(key, data);
+        renderList(key, listId, formatter, fields);
+      };
+      actions.appendChild(editBtn);
+
+      li.appendChild(actions);
+      list.appendChild(li);
+    });
+  }
+
+  // --- Projects ---
+  document.getElementById('projectForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const proj = {
+      projectTitle: document.getElementById('projectTitle').value.trim(),
+      projectDescription: document.getElementById('projectDescription').value.trim(),
+      projectTech: document.getElementById('projectTech').value.trim(),
+      projectDuration: document.getElementById('projectDuration').value.trim(),
+      projectRole: document.getElementById('projectRole').value.trim(),
+      projectTeamSize: document.getElementById('projectTeamSize').value.trim(),
+      projectType: document.getElementById('projectType').value,
+      projectStatus: document.getElementById('projectStatus').value,
+      projectGrade: document.getElementById('projectGrade').value.trim(),
+      projectLink: document.getElementById('projectLink').value.trim(),
+      projectPdfLink: document.getElementById('projectPdfLink').value.trim()
+    };
+    const data = getData('projects');
+    data.push(proj);
+    setData('projects', data);
+    renderProjectList();
+    e.target.reset();
+  });
+
+  function projectFormatter(p) {
+    return `
+      <strong>${p.projectTitle}</strong> <br/>
+      <em>${p.projectDescription}</em> <br/>
+      Tech: ${p.projectTech || 'N/A'} | Duration: ${p.projectDuration || 'N/A'} | Role: ${p.projectRole || 'N/A'} | Team: ${p.projectTeamSize || 'N/A'} <br/>
+      Type: ${p.projectType || 'N/A'} | Status: ${p.projectStatus || 'N/A'} | Grade: ${p.projectGrade || 'N/A'} <br/>
+      Link: ${p.projectLink ? `<a href="${p.projectLink}" target="_blank">Project</a>` : 'N/A'} | 
+      PDF: ${p.projectPdfLink ? `<a href="${p.projectPdfLink}" target="_blank">Download</a>` : 'N/A'}
+    `;
+  }
+
+  function renderProjectList() {
+    renderList('projects', 'projectList', projectFormatter, [
+      'projectTitle', 'projectDescription', 'projectTech', 'projectDuration', 'projectRole', 'projectTeamSize',
+      'projectType', 'projectStatus', 'projectGrade', 'projectLink', 'projectPdfLink'
+    ]);
+  }
+
+  renderProjectList();
+
+  // --- Certificates ---
+  document.getElementById('certificateForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const cert = {
+      certificateTitle: document.getElementById('certificateTitle').value.trim(),
+      certificateIssuer: document.getElementById('certificateIssuer').value.trim(),
+      certificateDate: document.getElementById('certificateDate').value,
+      certificateExpiryDate: document.getElementById('certificateExpiryDate').value,
+      certificateDescription: document.getElementById('certificateDescription').value.trim(),
+      certificateId: document.getElementById('certificateId').value.trim(),
+      certificateType: document.getElementById('certificateType').value.trim(),
+      certificateLevel: document.getElementById('certificateLevel').value.trim(),
+      certificateVerified: document.getElementById('certificateVerified').value,
+      certificateLink: document.getElementById('certificateLink').value.trim(),
+      certificatePdfLink: document.getElementById('certificatePdfLink').value.trim()
+    };
+    const data = getData('certificates');
+    data.push(cert);
+    setData('certificates', data);
+    renderCertificateList();
+    e.target.reset();
+  });
+
+  function certificateFormatter(c) {
+    return `
+      <strong>${c.certificateTitle}</strong> by <em>${c.certificateIssuer}</em> <br/>
+      Issued on: ${c.certificateDate || 'N/A'} | Expiry: ${c.certificateExpiryDate || 'N/A'} <br/>
+      Description: ${c.certificateDescription || 'N/A'} <br/>
+      ID: ${c.certificateId || 'N/A'} | Type: ${c.certificateType || 'N/A'} | Level: ${c.certificateLevel || 'N/A'} | Verified: ${c.certificateVerified || 'N/A'} <br/>
+      Link: ${c.certificateLink ? `<a href="${c.certificateLink}" target="_blank">Link</a>` : 'N/A'} | 
+      PDF: ${c.certificatePdfLink ? `<a href="${c.certificatePdfLink}" target="_blank">Download</a>` : 'N/A'}
+    `;
+  }
+
+  function renderCertificateList() {
+    renderList('certificates', 'certificateList', certificateFormatter, [
+      'certificateTitle', 'certificateIssuer', 'certificateDate', 'certificateExpiryDate', 'certificateDescription',
+      'certificateId', 'certificateType', 'certificateLevel', 'certificateVerified', 'certificateLink', 'certificatePdfLink'
+    ]);
+  }
+
+  renderCertificateList();
+
+  // --- Competitive Exams ---
+  document.getElementById('examForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const exam = {
+      examName: document.getElementById('examName').value.trim(),
+      examDate: document.getElementById('examDate').value,
+      examScore: document.getElementById('examScore').value.trim(),
+      examPercentile: document.getElementById('examPercentile').value,
+      examAttempt: document.getElementById('examAttempt').value,
+      examDescription: document.getElementById('examDescription').value.trim(),
+      examType: document.getElementById('examType').value.trim(),
+      examSubject: document.getElementById('examSubject').value.trim(),
+      examMode: document.getElementById('examMode').value.trim(),
+      examOrg: document.getElementById('examOrg').value.trim(),
+      examLocation: document.getElementById('examLocation').value.trim(),
+      examPdfLink: document.getElementById('examPdfLink').value.trim()
+    };
+    const data = getData('exams');
+    data.push(exam);
+    setData('exams', data);
+    renderExamList();
+    e.target.reset();
+  });
+
+  function examFormatter(e) {
+    return `
+      <strong>${e.examName}</strong> (${e.examType || 'N/A'}) <br/>
+      Date: ${e.examDate || 'N/A'} | Score: ${e.examScore || 'N/A'} | Percentile: ${e.examPercentile || 'N/A'} | Attempt: ${e.examAttempt || 'N/A'} <br/>
+      Subject: ${e.examSubject || 'N/A'} | Mode: ${e.examMode || 'N/A'} | Organization: ${e.examOrg || 'N/A'} | Location: ${e.examLocation || 'N/A'} <br/>
+      Description: ${e.examDescription || 'N/A'} <br/>
+      PDF: ${e.examPdfLink ? `<a href="${e.examPdfLink}" target="_blank">Download</a>` : 'N/A'}
+    `;
+  }
+
+  function renderExamList() {
+    renderList('exams', 'examList', examFormatter, [
+      'examName', 'examDate', 'examScore', 'examPercentile', 'examAttempt', 'examDescription',
+      'examType', 'examSubject', 'examMode', 'examOrg', 'examLocation', 'examPdfLink'
+    ]);
+  }
+
+  renderExamList();
+  // Utility to get/set localStorage data
+function getData(key) {
+  return JSON.parse(localStorage.getItem(key)) || [];
+}
+function setData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+function renderList(key, listId, formatter, fields) {
+  const data = getData(key);
+  const list = document.getElementById(listId);
+  list.innerHTML = '';
+  data.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = formatter(item);
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = () => {
+      data.splice(index, 1);
+      setData(key, data);
+      renderList(key, listId, formatter, fields);
+    };
+    actions.appendChild(delBtn);
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = () => {
+      fields.forEach(f => {
+        const el = document.getElementById(f);
+        if (el) el.value = item[f] || '';
+      });
+      data.splice(index, 1);
+      setData(key, data);
+      renderList(key, listId, formatter, fields);
+    };
+    actions.appendChild(editBtn);
+    li.appendChild(actions);
+    list.appendChild(li);
+  });
+}
+
+// Internships
+document.getElementById('internshipForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const intern = {
+    companyName: e.target.companyName.value.trim(),
+    internRole: e.target.internRole.value.trim(),
+    internDuration: e.target.internDuration.value.trim(),
+    internLocation: e.target.internLocation.value.trim(),
+    internStipend: e.target.internStipend.value.trim(),
+    internDescription: e.target.internDescription.value.trim(),
+    internCertLink: e.target.internCertLink.value.trim(),
+  };
+  const data = getData('internships');
+  data.push(intern);
+  setData('internships', data);
+  renderInternships();
+  e.target.reset();
+});
+function internshipFormatter(i) {
+  return `<strong>${i.companyName}</strong> — <em>${i.internRole}</em><br/>
+    Duration: ${i.internDuration || 'N/A'} | Location: ${i.internLocation || 'N/A'} | Stipend: ${i.internStipend || 'N/A'}<br/>
+    Description: ${i.internDescription || 'N/A'}<br/>
+    Certificate: ${i.internCertLink ? `<a href="${i.internCertLink}" target="_blank">View</a>` : 'N/A'}`;
+}
+function renderInternships() {
+  renderList('internships', 'internshipList', internshipFormatter, [
+    'companyName', 'internRole', 'internDuration', 'internLocation', 'internStipend', 'internDescription', 'internCertLink'
+  ]);
+}
+renderInternships();
+
+// Workshops/Seminars/Webinars
+document.getElementById('workshopForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const w = {
+    workshopTitle: e.target.workshopTitle.value.trim(),
+    workshopOrganizer: e.target.workshopOrganizer.value.trim(),
+    workshopDate: e.target.workshopDate.value,
+    workshopDuration: e.target.workshopDuration.value.trim(),
+    workshopMode: e.target.workshopMode.value,
+    workshopDescription: e.target.workshopDescription.value.trim(),
+    workshopCertLink: e.target.workshopCertLink.value.trim(),
+  };
+  const data = getData('workshops');
+  data.push(w);
+  setData('workshops', data);
+  renderWorkshops();
+  e.target.reset();
+});
+function workshopFormatter(w) {
+  return `<strong>${w.workshopTitle}</strong> by ${w.workshopOrganizer || 'N/A'}<br/>
+    Date: ${w.workshopDate || 'N/A'} | Duration: ${w.workshopDuration || 'N/A'} | Mode: ${w.workshopMode || 'N/A'}<br/>
+    Description: ${w.workshopDescription || 'N/A'}<br/>
+    Certificate: ${w.workshopCertLink ? `<a href="${w.workshopCertLink}" target="_blank">View</a>` : 'N/A'}`;
+}
+function renderWorkshops() {
+  renderList('workshops', 'workshopList', workshopFormatter, [
+    'workshopTitle', 'workshopOrganizer', 'workshopDate', 'workshopDuration', 'workshopMode', 'workshopDescription', 'workshopCertLink'
+  ]);
+}
+renderWorkshops();
+
+// Skills
+document.getElementById('skillForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const s = {
+    skillName: e.target.skillName.value.trim(),
+    skillLevel: e.target.skillLevel.value,
+    skillExperience: e.target.skillExperience.value,
+    skillTech: e.target.skillTech.value.trim(),
+  };
+  const data = getData('skills');
+  data.push(s);
+  setData('skills', data);
+  renderSkills();
+  e.target.reset();
+});
+function skillFormatter(s) {
+  return `<strong>${s.skillName}</strong> (${s.skillLevel}) — Experience: ${s.skillExperience || 'N/A'} years<br/>
+    Technologies/Tools: ${s.skillTech || 'N/A'}`;
+}
+function renderSkills() {
+  renderList('skills', 'skillList', skillFormatter, [
+    'skillName', 'skillLevel', 'skillExperience', 'skillTech'
+  ]);
+}
+renderSkills();
+
+// Extracurricular Activities
+document.getElementById('activityForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = {
+    activityName: e.target.activityName.value.trim(),
+    activityRole: e.target.activityRole.value,
+    activityDescription: e.target.activityDescription.value.trim(),
+    activityDuration: e.target.activityDuration.value.trim(),
+  };
+  const data = getData('activities');
+  data.push(a);
+  setData('activities', data);
+  renderActivities();
+  e.target.reset();
+});
+function activityFormatter(a) {
+  return `<strong>${a.activityName}</strong> — Role: ${a.activityRole}<br/>
+    Duration: ${a.activityDuration || 'N/A'}<br/>
+    Description: ${a.activityDescription || 'N/A'}`;
+}
+function renderActivities() {
+  renderList('activities', 'activityList', activityFormatter, [
+    'activityName', 'activityRole', 'activityDescription', 'activityDuration'
+  ]);
+}
+renderActivities();
+
+// Achievements / Awards
+document.getElementById('achievementForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = {
+    awardTitle: e.target.awardTitle.value.trim(),
+    awardIssuer: e.target.awardIssuer.value.trim(),
+    awardDate: e.target.awardDate.value,
+    awardDescription: e.target.awardDescription.value.trim(),
+  };
+  const data = getData('achievements');
+  data.push(a);
+  setData('achievements', data);
+  renderAchievements();
+  e.target.reset();
+});
+function achievementFormatter(a) {
+  return `<strong>${a.awardTitle}</strong> from ${a.awardIssuer || 'N/A'}<br/>
+    Date: ${a.awardDate || 'N/A'}<br/>
+    Description: ${a.awardDescription || 'N/A'}`;
+}
+function renderAchievements() {
+  renderList('achievements', 'awardList', achievementFormatter, [
+    'awardTitle', 'awardIssuer', 'awardDate', 'awardDescription'
+  ]);
+}
+renderAchievements();
+
+// Publications
+document.getElementById('publicationForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const p = {
+    pubTitle: e.target.pubTitle.value.trim(),
+    pubJournal: e.target.pubJournal.value.trim(),
+    pubDate: e.target.pubDate.value,
+    pubLink: e.target.pubLink.value.trim(),
+    pubSummary: e.target.pubSummary.value.trim(),
+  };
+  const data = getData('publications');
+  data.push(p);
+  setData('publications', data);
+  renderPublications();
+  e.target.reset();
+});
+function publicationFormatter(p) {
+  return `<strong>${p.pubTitle}</strong> in ${p.pubJournal || 'N/A'}<br/>
+    Date: ${p.pubDate || 'N/A'}<br/>
+    Summary: ${p.pubSummary || 'N/A'}<br/>
+    Link: ${p.pubLink ? `<a href="${p.pubLink}" target="_blank">View</a>` : 'N/A'}`;
+}
+function renderPublications() {
+  renderList('publications', 'publicationList', publicationFormatter, [
+    'pubTitle', 'pubJournal', 'pubDate', 'pubLink', 'pubSummary'
+  ]);
+}
+renderPublications();
+
+// Volunteer Experience
+document.getElementById('volunteerForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = {
+    volOrg: e.target.volOrg.value.trim(),
+    volRole: e.target.volRole.value.trim(),
+    volDuration: e.target.volDuration.value.trim(),
+    volDescription: e.target.volDescription.value.trim(),
+  };
+  const data = getData('volunteers');
+  data.push(v);
+  setData('volunteers', data);
+  renderVolunteers();
+  e.target.reset();
+});
+function volunteerFormatter(v) {
+  return `<strong>${v.volOrg}</strong> — Role: ${v.volRole || 'N/A'}<br/>
+    Duration: ${v.volDuration || 'N/A'}<br/>
+    Description: ${v.volDescription || 'N/A'}`;
+}
+function renderVolunteers() {
+  renderList('volunteers', 'volunteerList', volunteerFormatter, [
+    'volOrg', 'volRole', 'volDuration', 'volDescription'
+  ]);
+}
+renderVolunteers();
+
+// Hobbies & Interests
+document.getElementById('hobbiesForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const hobbiesRaw = e.target.hobbiesList.value.trim();
+  if (!hobbiesRaw) return;
+  const hobbiesArray = hobbiesRaw.split(',').map(h => h.trim()).filter(h => h.length > 0);
+  setData('hobbies', hobbiesArray);
+  renderHobbies();
+  e.target.reset();
+});
+function renderHobbies() {
+  const hobbies = getData('hobbies');
+  const ul = document.getElementById('hobbiesListDisplay');
+  ul.innerHTML = '';
+  hobbies.forEach((hobby, i) => {
+    const li = document.createElement('li');
+    li.textContent = hobby;
+    // Add delete button for each hobby
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.style.marginLeft = '10px';
+    delBtn.onclick = () => {
+      hobbies.splice(i, 1);
+      setData('hobbies', hobbies);
+      renderHobbies();
+    };
+    li.appendChild(delBtn);
+    ul.appendChild(li);
+  });
+}
+renderHobbies();
+
+</script>
+
+</body>
+</html>

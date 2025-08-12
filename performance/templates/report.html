@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Performance Report</h1>
+
+    <canvas id="performanceChart" width="400" height="200"></canvas>
+    <h2>Weak Subjects</h2>
+    <ul>
+        {% for subject in weak_subjects %}
+            <li>{{ subject.exam_type.name }} - Score: {{ subject.score }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceData = {{ performance_data|safe }};
+        const performanceLabels = {{ performance_labels|safe }};
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: performanceLabels,
+                datasets: [{
+                    label: 'Scores',
+                    data: performanceData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

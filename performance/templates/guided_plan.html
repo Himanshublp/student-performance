@@ -1,713 +1,584 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guided Plan for Cracking Coding Interviews & Competitive Exams</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f3f5;
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Guided Plan - Student Performance Tracker{% endblock %}
+
+{% block content %}
+<style>
+    .plan-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 60px 40px;
+        border-radius: 30px;
+        color: white;
+        margin-bottom: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: slideIn 0.6s ease;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .hero-title {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .hero-subtitle {
+        font-size: 18px;
+        opacity: 0.95;
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .roadmap-section {
+        margin-bottom: 50px;
+    }
+    
+    .section-title {
+        color: white;
+        margin-bottom: 30px;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .roadmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+    
+    .roadmap-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .roadmap-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    
+    .roadmap-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(102,126,234,0.3);
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea20, #764ba220);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .roadmap-card.active .step-number {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .roadmap-card.completed .step-number {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .roadmap-card h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+    
+    .roadmap-card p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 15px;
+    }
+    
+    .active-badge {
+        background: linear-gradient(135deg, #667eea20, #764ba220);
+        color: #667eea;
+    }
+    
+    .completed-badge {
+        background: #d4edda;
+        color: #27ae60;
+    }
+    
+    .resume-section {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+    }
+    
+    .resume-upload-area {
+        border: 3px dashed #e0e0e0;
+        padding: 50px;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    .resume-upload-area:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea10, #764ba210);
+    }
+    
+    .resume-upload-area i {
+        font-size: 64px;
+        color: #667eea;
+        margin-bottom: 20px;
+    }
+    
+    .resume-feedback {
+        margin-top: 30px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        display: none;
+    }
+    
+    .resume-feedback.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .study-schedule {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+    }
+    
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .schedule-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        font-weight: 500;
+    }
+    
+    .schedule-table td {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #666;
+    }
+    
+    .schedule-table tr:hover {
+        background: linear-gradient(135deg, #667eea10, #764ba210);
+    }
+    
+    .progress-tracker {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+    }
+    
+    .progress-bar-container {
+        height: 20px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 10px;
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+    
+    .resources-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 40px;
+    }
+    
+    .resource-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .resource-card h4 {
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .resource-list {
+        list-style: none;
+    }
+    
+    .resource-list li {
+        margin-bottom: 12px;
+    }
+    
+    .resource-list a {
+        color: #666;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+    
+    .resource-list a:hover {
+        color: #667eea;
+        transform: translateX(5px);
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
         }
-
-        header {
-            background-color: #3498db;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .plan-title {
-            text-align: center;
-            font-size: 40px;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-
-        .plan-introduction {
-            text-align: center;
-            font-size: 20px;
-            color: #34495e;
-            margin-bottom: 40px;
-        }
-
-        .plan-section {
-            margin-bottom: 40px;
-        }
-
-        .plan-section h2 {
-            font-size: 28px;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .plan-section ul {
-            margin-left: 20px;
-            padding-left: 10px;
-        }
-
-        .plan-section li {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-
-        .goal {
-            font-weight: bold;
-            color: #2980b9;
-        }
-
-        .highlight {
-            color: #e74c3c;
-        }
-
-        .study-schedule {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .progress-bar {
-            width: 100%;
-            background-color: #f2f2f2;
-            border-radius: 20px;
-            overflow: hidden;
-            margin-top: 30px;
-        }
-
-        .progress-bar .progress {
-            height: 20px;
-            width: 0;
-            background-color: #3498db;
-            transition: width 1s ease-in-out;
-        }
-
-        .tracker {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .tracker button {
-            padding: 10px 20px;
-            background-color: #2980b9;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .tracker button:hover {
-            background-color: #21618c;
-        }
-
-        .footer {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .roadmap {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 50px;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .roadmap-item {
-            text-align: center;
-            padding: 15px;
-            border: 1px solid #3498db;
-            border-radius: 8px;
-            flex-grow: 1;
-        }
-
-        .roadmap-item.active {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .roadmap-item.completed {
-            background-color: #27ae60;
-            color: white;
-        }
-
-        .chat-section {
-            background-color: #fff;
-            padding: 20px;
-            margin-top: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .chat-header {
-            font-size: 24px;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .chat-box {
-            height: 250px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-y: scroll;
-            font-size: 16px;
-        }
-
-        .chat-box p {
-            margin: 5px 0;
-        }
-
-        .chat-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f3f5;
-        }
-
-        header {
-            background-color: #3498db;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .dashboard-title {
-            text-align: center;
-            font-size: 40px;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-
-        .charts-container {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-
-        .chart-box {
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 45%;
-        }
-
-        .chart-box canvas {
-            max-width: 100%;
-        }
-
-        .footer {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin-top: 40px;
-        }
-        /* General Chat Section Styling */
-.chat-section {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 15px;
-    font-family: Arial, sans-serif;
-}
-
-/* Header Styling with Chat Icon */
-.chat-header {
-    font-size: 24px;
-    color: #007bff;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.chat-header i {
-    font-size: 30px;
-    color: #007bff;
-}
-
-/* Chat Box Styling */
-.chat-box {
-    background-color: #ffffff;
-    height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
-}
-
-/* Input Field Styling */
-.chat-input {
-    width: 80%;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-right: 10px;
-}
-
-/* Input Container for Flex Layout */
-.input-container {
-    display: flex;
-    align-items: center;
-}
-
-/* Send Button Styling */
-.send-button {
-    background-color: #007bff;
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.send-button i {
-    color: white;
-    font-size: 20px;
-}
-
-/* Send Button Hover Effect */
-.send-button:hover {
-    background-color: #0056b3;
-}
-
-/* Remove outline when button is focused */
-.send-button:focus {
-    outline: none;
-}
-
-/* Message Styling */
-.chat-message {
-    background-color: #f1f1f1;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    max-width: 75%;
-    margin-left: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* User's Message Styling */
-.chat-message.user {
-    background-color: #007bff;
-    color: white;
-    align-self: flex-end;
-}
-
-/* Peer Message Styling */
-.chat-message.peer {
-    background-color: #e9ecef;
-    color: black;
-    align-self: flex-start;
-}
-
-/* Scrollbar for Chat Box */
-.chat-box::-webkit-scrollbar {
-    width: 8px;
-}
-
-.chat-box::-webkit-scrollbar-thumb {
-    background-color: #007bff;
-    border-radius: 10px;
-}
-
-/* Hover effect on scrollbar */
-.chat-box::-webkit-scrollbar-thumb:hover {
-    background-color: #0056b3;
-}
-
-    </style>
-</head>
-<body>
-    <header>
-        Guided Plan for Cracking Coding Interviews & Competitive Exams
-    </header>
-
-    <div class="container">
-        <h1 class="plan-title">Your Personal Guided Plan</h1>
-        <p class="plan-introduction">This comprehensive plan is designed to help you improve in coding interviews and competitive exams. Based on your current progress and needs, we have customized this path to give you a clear roadmap for success!</p>
-
-        <div class="roadmap">
-            <div class="roadmap-item active" id="roadmapStep1">
-                <h3>Step 1</h3>
-                <p>Learn Basic Concepts</p>
-            </div>
-            <div class="roadmap-item" id="roadmapStep2">
-                <h3>Step 2</h3>
-                <p>Practice Coding</p>
-            </div>
-            <div class="roadmap-item" id="roadmapStep3">
-                <h3>Step 3</h3>
-                <p>Mock Interviews</p>
-            </div>
-            <div class="roadmap-item" id="roadmapStep4">
-                <h3>Step 4</h3>
-                <p>Final Revision</p>
-            </div>
-        </div>
-<div class="plan-section">
-    <h2>Resume Upload & Review</h2>
-    <p>Upload your resume (PDF) to get instant suggestions and feedback.</p>
-    <input type="file" id="resumeInput" accept=".pdf" />
-    <button onclick="reviewResume()">Review Resume</button>
-    <div id="resumeFeedback" style="margin-top: 20px; padding: 10px; background: #fdfdfd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
-</div>
-<div id="placementRoadmap" style="display: none; margin-top: 30px; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-    <h2 style="color: #2c3e50;">🚀 Roadmap to Crack Placements</h2>
-    <ol style="font-size: 18px; color: #2c3e50; line-height: 1.8;">
-        <li>
-            <strong class="goal">Strengthen Computer Science Fundamentals:</strong> 
-            Revise subjects like OS, DBMS, Networks, and OOP using trusted resources (CS50, Gate Smashers, etc.).
-        </li>
-        <li>
-            <strong class="goal">Master Data Structures & Algorithms:</strong> 
-            Solve 300+ problems on platforms like LeetCode or GFG, focusing on key patterns.
-        </li>
-        <li>
-            <strong class="goal">Deepen MERN Stack Proficiency:</strong> 
-            Build advanced apps with dashboards, authentication, payments, and REST APIs.
-        </li>
-        <li>
-            <strong class="goal">Learn System Design Basics:</strong> 
-            Use resources like “Grokking the System Design Interview” and Gaurav Sen's YouTube.
-        </li>
-        <li>
-            <strong class="goal">Polish Resume & LinkedIn:</strong> 
-            Keep metrics-driven achievements front and center (as you’ve done well already).
-        </li>
-        <li>
-            <strong class="goal">Mock Interviews & Coding Contests:</strong> 
-            Use Pramp, Interviewing.io and weekly contests on Codeforces/LeetCode to stay sharp.
-        </li>
-        <li>
-            <strong class="goal">Prepare HR & Behavioral Questions:</strong> 
-            Use the STAR method. Practice common prompts like "Tell me about yourself".
-        </li>
-        <li>
-            <strong class="goal">Apply Strategically:</strong> 
-            Tailor each resume and apply via LinkedIn, AngelList, and employee referrals.
-        </li>
-    </ol>
-</div>
- <button onclick="window.location.href='/chat'" 
-        style="
-          padding: 10px 20px; 
-          font-size: 1rem; 
-          border: none; 
-          border-radius: 5px; 
-          background-color: #4a90e2; 
-          color: white; 
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-        "
-        onmouseover="this.style.backgroundColor='#357ABD'" 
-        onmouseout="this.style.backgroundColor='#4a90e2'">
-  Go to Chat
-</button> 
-
-
-        <div class="plan-section tracker">
-            <h2>Performance Tracker</h2>
-            <p>Track your daily progress with our interactive progress bar.</p>
-            <div class="progress-bar">
-                <div class="progress" style="width: 0%;"></div>
-            </div>
-            <button onclick="updateProgress()">Update Progress</button>
-        </div>
-
-        <div class="plan-section study-schedule">
-            <h2>Study Schedule</h2>
-            <p>This section provides a dynamic study schedule tailored to your learning stage.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time Period</th>
-                        <th>Activity</th>
-                        <th>Subject/Area</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Morning (7 AM - 9 AM)</td>
-                        <td>Concept Review</td>
-                        <td>Mathematics (Advanced Topics)</td>
-                    </tr>
-                    <tr>
-                        <td>Mid-Morning (9 AM - 11 AM)</td>
-                        <td>Practice Problems</td>
-                        <td>Programming (Data Structures)</td>
-                    </tr>
-                    <tr>
-                        <td>Afternoon (1 PM - 3 PM)</td>
-                        <td>Mock Tests</td>
-                        <td>Competitive Exam (Aptitude)</td>
-                    </tr>
-                    <tr>
-                        <td>Evening (4 PM - 6 PM)</td>
-                        <td>Revision and Problem Solving</td>
-                        <td>Computer Science Fundamentals</td>
-                    </tr>
-                    <tr>
-                        <td>Night (7 PM - 9 PM)</td>
-                        <td>Relaxation and Mental Preparation</td>
-                        <td>General Knowledge / Strategy</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="plan-section">
-            <h2>Expert Tips</h2>
-            <ul id="expertTips">
-                <!-- Dynamic expert tips will be inserted here -->
-            </ul>
-        </div>
-
-      
-        
-    </div>
-    <div class="container">
-        <h1 class="dashboard-title">Dashboard: Focus Areas & Progress</h1>
-        <div class="charts-container">
-            <div class="chart-box">
-                <h2>Progress Overview</h2>
-                <canvas id="progressChart"></canvas>
-            </div>
-            <div class="chart-box">
-                <h2>Time Spent by Topic</h2>
-                <canvas id="timeChart"></canvas>
-            </div>
-            <div class="chart-box">
-                <h2>Focus Area Scores</h2>
-                <canvas id="focusChart"></canvas>
-            </div>
-            <div class="chart-box">
-                <h2>Daily Activity Tracker</h2>
-                <canvas id="activityChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <footer class="footer">
-        Designed to help you succeed step by step. Let’s achieve your goals together!
-    </footer>
-
-    <script>
-function reviewResume() {
-  const feedback = `
-  <div style="font-family: 'Roboto', sans-serif; line-height: 1.6; font-size: 16px;">
-    <h2 style="color: #27ae60;">✅ Resume Review Summary</h2>
-    <div style="background-color: #ecf9ec; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-      <ul>
-        <li><strong style="color: #2c3e50;">Overall Clarity:</strong> Well-structured, concise, and easy to read with strong formatting choices.</li>
-        <li><strong style="color: #2c3e50;">Technical Stack:</strong> Diverse and relevant technologies (MERN, Python, Django, Power BI, etc.) are clearly outlined.</li>
-        <li><strong style="color: #2c3e50;">Impact-Driven:</strong> Excellent use of metrics to show real-world impact (e.g., reduced errors, improved speed, increased bookings).</li>
-        <li><strong style="color: #2c3e50;">Certifications:</strong> Shopify Partner Academy is well-placed and strengthens your credibility.</li>
-      </ul>
-    </div>
-
-    <h2 style="color: #3498db;">🚀 Projects Review</h2>
-    <div style="background-color: #eaf4fc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-      <ul>
-        <li>
-          <strong>🏠 Room Finder Platform:</strong> Great real-world application with measurable success (e.g., 500+ listings, 20% faster discovery). <span style="color: green;">Strong demonstration of full-stack and UX design skills.</span>
-        </li>
-        <li>
-          <strong>🌾 AgriConnect:</strong> Innovative and socially impactful project with technical depth (real-time messaging, dashboards). <span style="color: green;">Outstanding integration of backend and user-centered features.</span>
-        </li>
-        <li>
-          <strong>🛍️ Shopify E-Commerce Site:</strong> Impressive use of Shopify + Liquid to drive retention and conversions. <span style="color: green;">Shows real business impact and frontend optimization.</span>
-        </li>
-        <li>
-          <strong>💼 Invoicing Tool (10xTech Internship):</strong> Strong contribution with measurable error reduction and API performance gains. <span style="color: green;">Highlights backend capabilities and practical understanding of business tools.</span>
-        </li>
-      </ul>
-    </div>
-
-    <h2 style="color: #e67e22;">🔧 Suggestions for Improvement</h2>
-    <div style="background-color: #fff6e5; padding: 15px; border-radius: 8px;">
-      <ul>
-        <li><strong>💡 Add a Career Summary:</strong> A short 2–3 line professional summary at the top would help provide quick context for your skills and goals.</li>
-        <li><strong>📍 Include Location Details:</strong> Add city/state to education and internship experiences for geographic context.</li>
-        <li><strong>📐 Improve Uniformity:</strong> Ensure consistent use of punctuation, spacing, and capitalization across all bullet points.</li>
-        <li><strong>⏱️ More Quantification:</strong> Some experiences could benefit from additional KPIs (e.g., revenue increase, user growth).</li>
-        <li><strong>📝 Consistent Tense:</strong> Use past tense for completed roles like the Web Developer Internship.</li>
-        <li><strong>🔍 ATS Optimization:</strong> Consider avoiding columns or graphics—use simple linear formatting for better Applicant Tracking System readability.</li>
-        <li><strong>🌟 Add Achievements:</strong> Include a brief section for academic or technical awards, hackathons, or recognitions.</li>
-        <li><strong>🤝 Mention Soft Skills:</strong> Add relevant interpersonal skills such as “Team Leadership”, “Time Management”, or “Client Communication”.</li>
-        <li><strong>🎓 List Key Courses (Optional):</strong> Consider listing core CS subjects like OS, DBMS, DSA, or Networking to appeal to technical recruiters.</li>
-      </ul>
-    </div>
-
-    <h2 style="color: #2980b9;">📈 Overall Rating: 
-      <span style="background-color: #27ae60; color: white; padding: 4px 10px; border-radius: 20px;">9.2 / 10</span>
-    </h2>
-  </div>`;
-  document.getElementById("resumeFeedback").innerHTML = feedback;
-  document.getElementById("placementRoadmap").style.display = "block"; 
-}
-
-
-        function updateProgress() {
-            const progressBar = document.querySelector('.progress-bar .progress'); let currentWidth = parseInt(progressBar.style.width) || 0; if (currentWidth < 100) { progressBar.style.width = currentWidth + 10 + '%'; } 
-        }
-        function addMessage() {
-        const chatInput = document.getElementById('chatInput');
-        const chatBox = document.getElementById('chatBox');
-        const message = chatInput.value.trim();
-
-        if (message) {
-            const messageElement = document.createElement('p');
-            messageElement.textContent = message;
-            chatBox.appendChild(messageElement);
-            chatInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight; // Automatically scroll to the bottom
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
-    const progressData = [10, 20, 35, 50, 65, 80, 95];
-        const topics = ['Mathematics', 'Data Structures', 'Aptitude', 'CS Fundamentals', 'General Knowledge'];
-        const timeSpent = [5, 10, 7, 6, 4]; // Hours
-        const focusScores = [85, 70, 75, 80, 90]; // Percentages
-        const dailyActivity = [3, 5, 4, 6, 7, 2, 4]; // Hours per day
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 
-        // Progress Chart
-        const progressCtx = document.getElementById('progressChart').getContext('2d');
-        new Chart(progressCtx, {
-            type: 'line',
-            data: {
-                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
-                datasets: [{
-                    label: 'Progress (%)',
-                    data: progressData,
-                    borderColor: '#3498db',
-                    borderWidth: 2,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
+<div class="plan-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1 class="hero-title">
+            <i class="fas fa-compass"></i> Your Guided Success Plan
+        </h1>
+        <p class="hero-subtitle">
+            Personalized roadmap to crack coding interviews, excel in competitive exams, 
+            and build a successful career in tech.
+        </p>
+    </div>
+    
+    <!-- Roadmap Section -->
+    <div class="roadmap-section">
+        <h2 class="section-title">
+            <i class="fas fa-map-signs"></i>
+            Career Roadmap
+        </h2>
+        
+        <div class="roadmap-grid">
+            <div class="roadmap-card active">
+                <div class="step-number">1</div>
+                <h3>Master DSA</h3>
+                <p>Learn Data Structures & Algorithms. Solve 300+ problems on LeetCode and GeeksforGeeks.</p>
+                <span class="status-badge active-badge">
+                    <i class="fas fa-clock"></i> In Progress
+                </span>
+            </div>
+            
+            <div class="roadmap-card">
+                <div class="step-number">2</div>
+                <h3>CS Fundamentals</h3>
+                <p>Revise OS, DBMS, Computer Networks, and Object-Oriented Programming.</p>
+                <span class="status-badge">Not Started</span>
+            </div>
+            
+            <div class="roadmap-card">
+                <div class="step-number">3</div>
+                <h3>System Design</h3>
+                <p>Learn Low-Level and High-Level System Design concepts.</p>
+                <span class="status-badge">Not Started</span>
+            </div>
+            
+            <div class="roadmap-card">
+                <div class="step-number">4</div>
+                <h3>Mock Interviews</h3>
+                <p>Practice with peers on Pramp and Interviewing.io. Give 20+ mock interviews.</p>
+                <span class="status-badge">Not Started</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resume Upload Section -->
+    <div class="resume-section">
+        <h3 style="color: #333; margin-bottom: 20px;">
+            <i class="fas fa-file-alt" style="color: #667eea;"></i>
+            Resume Review & Suggestions
+        </h3>
+        
+        <div class="resume-upload-area" onclick="document.getElementById('resumeFile').click();">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h4 style="color: #333; margin-bottom: 10px;">Upload Your Resume</h4>
+            <p style="color: #666;">Click to upload or drag and drop (PDF only)</p>
+            <input type="file" id="resumeFile" accept=".pdf" style="display: none;">
+        </div>
+        
+        <div id="resumeFeedback" class="resume-feedback"></div>
+    </div>
+    
+    <!-- Study Schedule -->
+    <div class="study-schedule">
+        <h3 style="color: #333; margin-bottom: 20px;">
+            <i class="fas fa-clock" style="color: #667eea;"></i>
+            Recommended Study Schedule
+        </h3>
+        
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Activity</th>
+                    <th>Topic</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>7:00 - 9:00 AM</td>
+                    <td>Concept Learning</td>
+                    <td>Data Structures & Algorithms</td>
+                    <td>2 hours</td>
+                </tr>
+                <tr>
+                    <td>9:30 - 11:30 AM</td>
+                    <td>Problem Solving</td>
+                    <td>LeetCode / Codeforces</td>
+                    <td>2 hours</td>
+                </tr>
+                <tr>
+                    <td>1:00 - 3:00 PM</td>
+                    <td>CS Fundamentals</td>
+                    <td>OS / DBMS / Networks</td>
+                    <td>2 hours</td>
+                </tr>
+                <tr>
+                    <td>4:00 - 6:00 PM</td>
+                    <td>Project Work</td>
+                    <td>Full Stack Development</td>
+                    <td>2 hours</td>
+                </tr>
+                <tr>
+                    <td>8:00 - 10:00 PM</td>
+                    <td>Revision & Mock Tests</td>
+                    <td>Previous day topics</td>
+                    <td>2 hours</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Progress Tracker -->
+    <div class="progress-tracker">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: #333;">
+                <i class="fas fa-chart-line" style="color: #667eea;"></i>
+                Your Progress
+            </h3>
+            <span style="color: #667eea; font-weight: 600;" id="progressPercentage">25%</span>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <div style="text-align: center;">
+                <h4 style="color: #333; font-size: 24px;" id="problemsSolved">45</h4>
+                <p style="color: #666;">Problems Solved</p>
+            </div>
+            <div style="text-align: center;">
+                <h4 style="color: #333; font-size: 24px;" id="hoursSpent">32</h4>
+                <p style="color: #666;">Hours Spent</p>
+            </div>
+            <div style="text-align: center;">
+                <h4 style="color: #333; font-size: 24px;" id="daysStreak">7</h4>
+                <p style="color: #666;">Day Streak</p>
+            </div>
+        </div>
+        
+        <button onclick="updateProgress()" class="btn btn-primary mt-4" style="background: linear-gradient(135deg, #667eea, #764ba2); border: none;">
+            <i class="fas fa-sync-alt"></i> Update Progress
+        </button>
+    </div>
+    
+    <!-- Learning Resources -->
+    <h2 class="section-title" style="margin-top: 40px;">
+        <i class="fas fa-book"></i>
+        Recommended Resources
+    </h2>
+    
+    <div class="resources-section">
+        <div class="resource-card">
+            <h4><i class="fas fa-code" style="color: #667eea;"></i> DSA Resources</h4>
+            <ul class="resource-list">
+                <li><a href="#"><i class="fab fa-leanpub"></i> LeetCode - Top 150 Interview Questions</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> GeeksforGeeks - DSA Self Paced</a></li>
+                <li><a href="#"><i class="fas fa-video"></i> NeetCode YouTube Channel</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> "Cracking the Coding Interview" Book</a></li>
+            </ul>
+        </div>
+        
+        <div class="resource-card">
+            <h4><i class="fas fa-database" style="color: #667eea;"></i> CS Fundamentals</h4>
+            <ul class="resource-list">
+                <li><a href="#"><i class="fas fa-video"></i> Gate Smashers (YouTube)</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> "Operating Systems" - Galvin</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> "Database Systems" - Korth</a></li>
+                <li><a href="#"><i class="fas fa-video"></i> Knowledge Gate (YouTube)</a></li>
+            </ul>
+        </div>
+        
+        <div class="resource-card">
+            <h4><i class="fas fa-project-diagram" style="color: #667eea;"></i> System Design</h4>
+            <ul class="resource-list">
+                <li><a href="#"><i class="fas fa-book"></i> "Grokking the System Design Interview"</a></li>
+                <li><a href="#"><i class="fas fa-video"></i> Gaurav Sen - System Design</a></li>
+                <li><a href="#"><i class="fas fa-video"></i> System Design Interview (YouTube)</a></li>
+                <li><a href="#"><i class="fas fa-file-alt"></i> High Scalability Blog</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-        // Time Spent by Topic Chart
-        const timeCtx = document.getElementById('timeChart').getContext('2d');
-        new Chart(timeCtx, {
-            type: 'pie',
-            data: {
-                labels: topics,
-                datasets: [{
-                    data: timeSpent,
-                    backgroundColor: ['#3498db', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c']
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
-
-        // Focus Area Scores Chart
-        const focusCtx = document.getElementById('focusChart').getContext('2d');
-        new Chart(focusCtx, {
-            type: 'bar',
-            data: {
-                labels: topics,
-                datasets: [{
-                    label: 'Scores (%)',
-                    data: focusScores,
-                    backgroundColor: '#2980b9'
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
-
-        // Daily Activity Tracker Chart
-        const activityCtx = document.getElementById('activityChart').getContext('2d');
-        new Chart(activityCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Hours per Day',
-                    data: dailyActivity,
-                    backgroundColor: '#2ecc71'
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
+<script>
+    // Resume upload handler
+    document.getElementById('resumeFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            reviewResume(file);
+        }
+    });
+    
+    function reviewResume(file) {
+        const feedback = `
+            <div style="animation: fadeIn 0.5s ease;">
+                <h4 style="color: #27ae60; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i> Resume Review Complete
+                </h4>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: #ecf9ec; border-radius: 10px;">
+                    <h5 style="color: #2c3e50; margin-bottom: 10px;">✅ Strengths</h5>
+                    <ul style="color: #666;">
+                        <li>• Clear and well-structured format</li>
+                        <li>• Strong technical skills section</li>
+                        <li>• Good project descriptions with metrics</li>
+                        <li>• Relevant certifications highlighted</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 10px;">
+                    <h5 style="color: #856404; margin-bottom: 10px;">📝 Suggestions for Improvement</h5>
+                    <ul style="color: #666;">
+                        <li>• Add a professional summary at the top</li>
+                        <li>• Include more quantifiable achievements</li>
+                        <li>• Add links to GitHub and LinkedIn</li>
+                        <li>• Consider adding a projects section with live demos</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 15px; background: #e1f0fa; border-radius: 10px;">
+                    <h5 style="color: #2c3e50; margin-bottom: 10px;">🎯 Overall Rating</h5>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 32px; font-weight: 700; color: #27ae60;">8.5/10</span>
+                        <span style="color: #666;">Great resume! Minor improvements will make it excellent.</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const feedbackDiv = document.getElementById('resumeFeedback');
+        feedbackDiv.innerHTML = feedback;
+        feedbackDiv.classList.add('show');
+    }
+    
+    // Update progress
+    function updateProgress() {
+        let currentWidth = parseInt(document.getElementById('progressFill').style.width) || 25;
+        if (currentWidth < 100) {
+            currentWidth = Math.min(currentWidth + 10, 100);
+            document.getElementById('progressFill').style.width = currentWidth + '%';
+            document.getElementById('progressPercentage').textContent = currentWidth + '%';
+            
+            // Update stats
+            document.getElementById('problemsSolved').textContent = Math.floor(45 + (currentWidth - 25) * 2);
+            document.getElementById('hoursSpent').textContent = Math.floor(32 + (currentWidth - 25) * 1.5);
+            document.getElementById('daysStreak').textContent = Math.floor(7 + (currentWidth - 25) * 0.3);
+        }
+    }
+    
+    // Auto-update stats every week (demo)
+    setInterval(() => {
+        let streak = parseInt(document.getElementById('daysStreak').textContent);
+        document.getElementById('daysStreak').textContent = streak + 1;
+    }, 86400000); // Every day in production
 </script>
+{% endblock %}

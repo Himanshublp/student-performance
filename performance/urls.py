@@ -1,41 +1,42 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
-from .views import ai_chat_api, chatbot_ui
 urlpatterns = [
-    # Login URL
+    # Authentication
+    path('', views.home, name='home'),
     path('login/', views.user_login, name='login'),
-
-    # Registration URL
     path('register/', views.register, name='register'),
-
-    # Dashboard URL (only accessible after login)
-    path('dashboard/', views.dashboard, name='dashboard'),
-
-    # Logout URL
     path('logout/', views.user_logout, name='logout'),
 
-    # Progress report URL
+    # Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
+
+    # Marksheet & Reports
+    path('upload_marksheet/', views.upload_marksheet, name='upload_marksheet'),
+    path('upload-pdf/', views.upload_pdf, name='upload_pdf'),
+    path('generate_report/', views.generate_report, name='generate_report'),
+    path('view_full_report/', views.view_full_report, name='view_full_report'),
     path('progress_report/', views.progress_report, name='progress_report'),
 
-    # Marksheet upload URL
-    path('upload_marksheet/', views.upload_marksheet, name='upload_marksheet'),
-
-    # Full report URL
-    path('view_full_report/', views.view_full_report, name='view_full_report'),
-
-    # Example CSV report generation
-    path('generate_report/', views.generate_report, name='generate_report'),
-
-    # Home URL - if the user is not logged in, it redirects to login
-    path('', views.home, name='home'),
+    # Add Data
     path('add_certificate/', views.add_certificate, name='add_certificate'),
     path('add_project/', views.add_project, name='add_project'),
     path('add_competitive_exam/', views.add_competitive_exam, name='add_competitive_exam'),
-    path('upload-pdf/', views.upload_pdf, name='upload_pdf'),
+
+    # Other
     path('guided_plan/', views.guided_plan, name='guided_plan'),
-    path('chat/', chatbot_ui, name='chat-ui'),
-    path('api/chat/', ai_chat_api, name='ai-chat-api'),
-    path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
-    
+    path('chat/', views.chatbot_ui, name='chat_ui'),
+    path('api/chat/', views.ai_chat_api, name='ai_chat_api'),
+
+    # APIs
+    path('api/get-user-data/', views.get_user_data, name='get_user_data'),
+    path('api/get-certificates/', views.get_certificates, name='get_certificates'),
+    path('api/get-projects/', views.get_projects, name='get_projects'),
+    path('api/get-exams/', views.get_exams, name='get_exams'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,511 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Performance Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-main {
+        padding: 20px 0;
+    }
     
-    <!-- Load static files -->
-    {% load static %}
-
-    <!-- Link to the CSS file -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-    <!-- Optional: Link to Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-
-    <!-- Optional: Include chart.js for performance visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f7fa;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease;
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            margin-top: 20px;
-            margin-left: 270px;
-            transition: margin-left 0.3s ease;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100%;
-            background-color: #2c3e50;
-            color: white;
-            padding: 30px 20px;
-            display: none;
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-            transition: width 0.3s ease;
-        }
-
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .sidebar a:hover {
-            background-color: #34495e;
-        }
-
-        .toggle-sidebar {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 10px;
-            cursor: pointer;
-            color: #2c3e50;
-            transition: color 0.3s ease;
-        }
-
-        .toggle-sidebar:hover {
-            color: #00c853;
-        }
-
-        .profile-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .profile-details {
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-photo {
-            background-color: #00c853;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            margin-right: 20px;
-            text-align: center;
-            color: white;
-            font-size: 35px;
-            line-height: 90px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-info h2 {
-            margin: 0;
-            font-size: 26px;
-            color: #333;
-        }
-
-        .profile-info p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .completion-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .completion-circle {
-            background-color: #00c853;
-            color: white;
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 32px;
-            margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .completion-actions a {
-            background-color: #00c853;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin: 8px 0;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .completion-actions a:hover {
-            background-color: #007f36;
-        }
-
-        .notifications {
-            background-color: #fff;
-            padding: 20px;
-            margin-top: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-        }
-
-        .notifications h2 {
-            font-size: 24px;
-            color: #333;
-        }
-
-        .notifications ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .notification-item {
-            background-color: #f1f1f1;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .notification-item:hover {
-            background-color: #e6e6e6;
-        }
-
-        .performance-section {
-            margin-top: 40px;
-        }
-
-        .performance-chart {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        .graph-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-
-        canvas {
-            width: 100%;
-            height: 300px;
-        }
-
-        .upload-marksheet {
-            margin-top: 40px;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-        }
-
-        .upload-btn {
-            background-color: #00c853;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .upload-btn:hover {
-            background-color: #007f36;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            font-size: 16px;
-        }
-
-        .footer a {
-            text-decoration: none;
-            color: #00c853;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: #007f36;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            transition: background-color 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 450px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #333;
-        }
-        /* General Link Styling */
-a {
-    text-decoration: none;
-    color: #007bff;
-    font-size: 18px;
-    font-weight: 600;
-    margin: 10px 0;
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect for Links */
-a:hover {
-    background-color: #007bff;
-    color: white;
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.4);
-}
-
-/* Focus Effect for Links */
-a:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
-}
-
-/* Additional Styling for Link Container */
-.link-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin: 20px 0;
-}
-.chart-container {
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-    </style>
-</head>
-<body>    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
-
+    .chart-container {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: fadeIn 0.5s ease;
+    }
     
-    <div class="sidebar" id="sidebar">
-       
-        <a href="/student_dashboard">Profile</a>
+    .semester-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+    
+    .semester-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(102,126,234,0.2);
+    }
+    
+    .sgpa-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    
+    .weak-subject {
+        color: #e74c3c;
+        font-size: 13px;
+        padding: 2px 8px;
+        background: #fde8e7;
+        border-radius: 12px;
+        display: inline-block;
+        margin: 2px;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 
-        <a href="/logout">Logout</a>
+<div class="dashboard-main">
+    <h1 class="section-title" style="color: white; margin-bottom: 30px;">
+        <i class="fas fa-chart-line"></i> Performance Dashboard
+    </h1>
+    
+    <!-- SGPA Trend Chart -->
+    <div class="chart-container">
+        <h3 style="color: #333; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-chart-line" style="color: #667eea;"></i>
+            SGPA Trend Analysis
+        </h3>
+        <img src="data:image/png;base64,{{ performance_trend }}" alt="SGPA Trend" style="width: 100%; border-radius: 10px;">
     </div>
-
-    <div class="main-content">
-      
-        <div class="profile-section">
-            <div class="profile-details">
-                <div class="profile-photo">HS</div>
-                <div class="profile-info">
-                    <h2>{{ user.username }}</h2>
-                    <p>B.Tech/B.E., Dr. APJ Abdul Kalam Technical University</p>
-                    <p>Kanpur | Male | 7th July 2003</p>
+    
+    <!-- Semester Performance Cards -->
+    <div class="row">
+        {% for perf in performance_data %}
+        <div class="col-md-6 col-lg-4">
+            <div class="semester-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="color: #333; font-weight: 600;">
+                        <i class="fas fa-book-open" style="color: #667eea;"></i>
+                        Semester {{ perf.semester }}
+                    </h4>
+                    <span class="sgpa-badge">SGPA: {{ perf.sgpa }}</span>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #666;">Total Marks</span>
+                        <span style="font-weight: 600;">{{ perf.total_marks }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">Status</span>
+                        <span style="font-weight: 600; color: {% if perf.result_status == 'PASS' %}#27ae60{% else %}#e74c3c{% endif %};">
+                            {{ perf.result_status }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if perf.weak_subjects %}
+                <div>
+                    <span style="color: #666; font-size: 14px;">Weak Subjects:</span>
+                    <div style="margin-top: 8px;">
+                        {% for subject in perf.weak_subjects %}
+                        <span class="weak-subject">
+                            <i class="fas fa-exclamation-triangle"></i> {{ subject }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="chart-container text-center" style="padding: 60px 20px;">
+                <i class="fas fa-chart-bar" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i>
+                <h4 style="color: #666;">No Performance Data Available</h4>
+                <p style="color: #999; margin-bottom: 30px;">Upload a marksheet to see your performance analysis</p>
+                <a href="{% url 'upload_marksheet' %}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Upload Marksheet
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="chart-container">
+                <h3 style="color: #333; margin-bottom: 20px;">
+                    <i class="fas fa-bolt" style="color: #667eea;"></i> Quick Actions
+                </h3>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'upload_marksheet' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-upload"></i> Upload Marksheet
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'view_full_report' %}" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-file-alt"></i> Full Report
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'progress_report' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-tasks"></i> Progress Report
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'generate_report' %}" class="btn btn-outline-warning w-100 py-3">
+                            <i class="fas fa-file-pdf"></i> Generate PDF
+                        </a>
+                    </div>
                 </div>
             </div>
-           
         </div>
-
-        <div class="notifications">
-            <h2>Latest Notifications</h2>
-            <ul>
-                <li class="notification-item">Your last exam score has been updated!</li>
-                <li class="notification-item">New coding challenges available on top platforms!</li>
-                <li class="notification-item">Don't miss the upcoming competitive exam deadlines.</li>
-            </ul>
-        </div>
-
-        <div class="performance-section">
-            <h2>Your Subject Performance</h2>
-            <div class="performance-chart">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-
-        <div class="graph-container">
-            <div style="width: 48%;">
-                <h3>Performance Over Semesters</h3>
-                <canvas id="semesterGraph"></canvas>
-            </div>
-            <div style="width: 48%;">
-                <h3>Subject-wise Performance</h3>
-                <canvas id="subjectGraph"></canvas>
-            </div>
-        </div>
-
-        <div class="upload-marksheet">
-            <h2>Upload Your Marksheet</h2>
-            <form action="{% url 'upload_marksheet' %}" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" name="marksheet" accept=".pdf,.jpg,.jpeg,.png" required>
-                <button type="submit">Upload Marksheet</button>
-            </form>
-        </div>
-        
-
-
-
-
-
-
-
-
-
-    
-    <div class="link-container">
-        <a href="{% url 'progress_report' %}">View Progress Report</a>
-        <a href="{% url 'guided_plan' %}">View Guided Plan</a>
     </div>
-
-    <!-- <div class="performance-section">
-        <h2>Your Subject Performance</h2>
-        <div class="performance-chart">
-            <canvas id="performanceChart"></canvas>
-        </div>
-    
-        {% if pdf_data %}
-            <div class="pdf-data">
-                <h3>Extracted Data from PDF:</h3>
-                <pre>{{ pdf_data }}</pre>
-            </div>
-        {% else %}
-            <div class="pdf-data">
-                <h3>Extracted Data from PDF (Dummy Data):</h3>
-                <pre>
-                    Subject: Mathematics
-                    Score: 85%
-                    Rank: 10
-                    Comments: Great performance, keep up the good work!
-                </pre>
-            </div>
-        {% endif %}
-    </div> -->
-    
-    <script>
-        let isClicked = false;
-
-        function toggleSidebar() {
-            isClicked = !isClicked;
-            document.getElementById("sidebar").style.display = isClicked ? "block" : "none";
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Example performance graph (bar chart)
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        const performanceChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Math', 'Physics', 'Chemistry', 'Programming'],
-                datasets: [{
-                    label: 'Scores',
-                    data: [85, 78, 92, 88],
-                    backgroundColor: 'rgba(0, 200, 83, 0.5)',
-                    borderColor: 'rgba(0, 200, 83, 1)',
-                    borderWidth: 1
-                }]
-            }
-        });
-
-        // Example performance over semesters graph
-        const semesterCtx = document.getElementById('semesterGraph').getContext('2d');
-        const semesterGraph = new Chart(semesterCtx, {
-            type: 'line',
-            data: {
-                labels: ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4'],
-                datasets: [{
-                    label: 'Cumulative GPA',
-                    data: [3.5, 3.7, 3.8, 4.0],
-                    borderColor: 'rgba(0, 200, 83, 1)',
-                    fill: false
-                }]
-            }
-        });
-
-        // Example subject-wise performance graph
-        const subjectCtx = document.getElementById('subjectGraph').getContext('2d');
-        const subjectGraph = new Chart(subjectCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Math', 'Physics', 'Chemistry', 'Programming'],
-                datasets: [{
-                    data: [35, 25, 20, 20],
-                    backgroundColor: ['#00c853', '#ff9800', '#3f51b5', '#f44336']
-                }]
-            }
-        });
-        
-    </script>
-</body>
-</html>
+</div>
+{% endblock %}

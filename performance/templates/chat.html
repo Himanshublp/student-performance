@@ -1,398 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Chatbot for College Students</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant - Student Performance Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    #chat-container {
-      width: 100%;
-      max-width: 480px;
-      height: 650px;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    h1 {
-      padding: 20px;
-      background: #4a90e2;
-      color: white;
-      font-size: 1.5rem;
-      text-align: center;
-      margin: 0;
-    }
+        .chat-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            height: 800px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            display: flex;
+            overflow: hidden;
+            animation: slideIn 0.6s ease;
+        }
 
-    #professional-select-container {
-      padding: 12px 20px;
-      background: #f0f4ff;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    label {
-      font-weight: 600;
-      color: #333;
-      white-space: nowrap;
-    }
+        /* Sidebar */
+        .chat-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
 
-    select {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      cursor: pointer;
-      background: white;
-      transition: border-color 0.2s;
-    }
+        .sidebar-header {
+            margin-bottom: 40px;
+        }
 
-    select:hover, select:focus {
-      border-color: #4a90e2;
-      outline: none;
-    }
+        .sidebar-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
 
-    #quick-tip {
-      background: #e0f0ff;
-      color: #03396c;
-      padding: 12px 20px;
-      font-size: 0.9rem;
-      border-left: 5px solid #4a90e2;
-      font-weight: 600;
-      display: none;
-    }
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-    #messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #f9f9fb;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+        .personality-list {
+            flex: 1;
+        }
 
-    .message {
-      display: flex;
-      align-items: flex-end;
-      animation: fadeInUp 0.3s ease forwards;
-    }
+        .personality-item {
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
 
-    .message.bot {
-      justify-content: flex-start;
-    }
+        .personality-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
 
-    .message.user {
-      justify-content: flex-end;
-    }
+        .personality-item.active {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
 
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      margin: 0 8px;
-      user-select: none;
-    }
+        .personality-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
 
-    .bubble {
-      max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 20px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
+        .personality-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
-    .message.bot .bubble {
-      background: #e5e5ea;
-      color: #2c2c2c;
-      border-bottom-left-radius: 4px;
-    }
+        .personality-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
 
-    .message.user .bubble {
-      background: #4a90e2;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
+        /* Main Chat Area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
 
-    form {
-      display: flex;
-      padding: 15px 20px;
-      background: #fafafa;
-      gap: 10px;
-      border-top: 1px solid #ddd;
-    }
+        .chat-header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    textarea {
-      flex: 1;
-      resize: none;
-      padding: 12px 16px;
-      border-radius: 25px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      min-height: 40px;
-      font-family: inherit;
-    }
+        .chat-header-info h3 {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
-    button {
-      background: #4a90e2;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      padding: 0 16px;
-      height: 40px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s;
-    }
+        .chat-header-info p {
+            color: #666;
+            font-size: 13px;
+        }
 
-    button:hover {
-      background: #3b78d8;
-    }
+        .back-btn {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            transition: all 0.3s;
+        }
 
-    #voice-btn {
-      background: #fff;
-      border: 2px solid #4a90e2;
-      color: #4a90e2;
-      font-size: 1.2rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      line-height: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
-      user-select: none;
-    }
+        .back-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
 
-    #voice-btn.active {
-      background: #4a90e2;
-      color: #fff;
-    }
+        .chat-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+        .message {
+            display: flex;
+            align-items: flex-end;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .message.bot .bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            max-height: 120px;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .voice-btn, .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .voice-btn {
+            background: #4a90e2;
+        }
+
+        .voice-btn.active {
+            background: #e74c3c;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .voice-btn:hover, .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .quick-tip {
+            margin: 10px 30px 0;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                flex-direction: column;
+                height: 90vh;
+            }
+            
+            .chat-sidebar {
+                width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="chat-wrapper">
+        <!-- Sidebar with AI Personalities -->
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <i class="fas fa-robot"></i>
+                    AI Assistant
+                </h2>
+                <p>Choose your chat personality</p>
+            </div>
+            
+            <div class="personality-list">
+                <div class="personality-item active" data-personality="teacher">
+                    <div class="personality-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="personality-name">Teacher</div>
+                    <div class="personality-desc">Academic help, study tips, exam preparation</div>
+                </div>
+                
+                <div class="personality-item" data-personality="counselor">
+                    <div class="personality-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="personality-name">Counselor</div>
+                    <div class="personality-desc">Mental health, motivation, career guidance</div>
+                </div>
+                
+                <div class="personality-item" data-personality="friend">
+                    <div class="personality-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="personality-name">Friend</div>
+                    <div class="personality-desc">Casual chat, study buddy, peer support</div>
+                </div>
+                
+                <div class="personality-item" data-personality="mentor">
+                    <div class="personality-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="personality-name">Mentor</div>
+                    <div class="personality-desc">Career advice, skill development, roadmap</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: auto; font-size: 12px; opacity: 0.8;">
+                <i class="fas fa-shield-alt"></i> Your conversations are private
+            </div>
+        </div>
+        
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <h3 id="chatPersonality">Chat with Teacher</h3>
+                    <p id="personalityDesc">Get academic help and study tips</p>
+                </div>
+                <a href="{% url 'student_dashboard' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+            
+            <div class="chat-messages" id="messages">
+                <div class="message bot">
+                    <img src="https://ui-avatars.com/api/?name=AI&background=667eea&color=fff" class="avatar" alt="Bot">
+                    <div class="bubble">
+                        Hello! I'm your AI teaching assistant. How can I help you with your studies today?
+                    </div>
+                </div>
+            </div>
+            
+            <div id="quickTip" class="quick-tip">
+                <i class="fas fa-lightbulb" style="color: #667eea;"></i>
+                <span>💡 Study Tip: Break your study sessions into focused 25-minute intervals with 5-minute breaks (Pomodoro Technique).</span>
+            </div>
+            
+            <div class="chat-input-container">
+                <button id="voiceBtn" class="voice-btn" title="Voice input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <textarea id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                
+                <button id="sendBtn" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div id="chat-container">
-  <h1>Chat with AI 🤖</h1>
+    <script>
+        const personalities = {
+            teacher: {
+                name: 'Teacher',
+                desc: 'Academic help, study tips, exam preparation',
+                tip: 'Break your study sessions into focused 25-minute intervals with 5-minute breaks (Pomodoro Technique).',
+                responses: {
+                    hello: 'Hello student! How can I assist you with your studies today?',
+                    help: 'I can help with subjects, assignments, and exam preparation. What topic are you studying?',
+                    exam: 'Start preparing early, make notes, practice previous papers, and take mock tests.',
+                    assignment: 'Break down your assignment into smaller tasks and tackle them one at a time.',
+                    math: 'Practice problems regularly and understand the concepts, not just formulas.',
+                    physics: 'Focus on understanding the principles and their applications in real life.',
+                    chemistry: 'Memorize periodic trends and practice reaction mechanisms.',
+                    default: 'That\'s a great question. Let me help you understand this better.'
+                }
+            },
+            counselor: {
+                name: 'Counselor',
+                desc: 'Mental health, motivation, career guidance',
+                tip: 'Take deep breaths when feeling overwhelmed. Your mental health is as important as grades.',
+                responses: {
+                    hello: 'Hello! How are you feeling today?',
+                    stress: 'It\'s normal to feel stressed. Take deep breaths, break tasks into smaller chunks, and remember to take breaks.',
+                    motivation: 'You\'ve made it this far! Celebrate small wins and keep moving forward.',
+                    career: 'Explore your interests, talk to professionals, and gain practical experience through internships.',
+                    anxiety: 'Practice mindfulness, maintain a routine, and don\'t hesitate to seek help when needed.',
+                    default: 'I\'m here to support you. Tell me more about what\'s on your mind.'
+                }
+            },
+            friend: {
+                name: 'Friend',
+                desc: 'Casual chat, study buddy, peer support',
+                tip: 'Studying with friends can make learning more fun and effective!',
+                responses: {
+                    hello: 'Hey! How\'s it going? Ready to study together?',
+                    study: 'Let\'s study together! We can quiz each other and share notes.',
+                    bored: 'Take a short break, grab a snack, and we can chat about something fun!',
+                    tired: 'I know the feeling! Take a 15-minute power nap, it helps!',
+                    default: 'I\'m here for you! What do you want to talk about?'
+                }
+            },
+            mentor: {
+                name: 'Mentor',
+                desc: 'Career advice, skill development, roadmap',
+                tip: 'Focus on building projects that solve real-world problems.',
+                responses: {
+                    hello: 'Welcome! Ready to plan your career path?',
+                    career: 'Start by identifying your interests and the skills required in that field.',
+                    skills: 'Focus on both technical skills and soft skills. Communication is key!',
+                    internship: 'Build projects, contribute to open source, and network on LinkedIn.',
+                    resume: 'Highlight your achievements with metrics and tailor it for each application.',
+                    default: 'Let\'s work on your career development plan.'
+                }
+            }
+        };
 
-  <div id="professional-select-container">
-    <label for="professional-select">Choose who to chat with:</label>
-    <select id="professional-select" aria-label="Select professional to chat">
-      <option value="teacher" selected>Teacher</option>
-      <option value="counselor">Counselor</option>
-      <option value="friend">Friend</option>
-      <option value="other">Other</option>
-    </select>
-  </div>
+        let currentPersonality = 'teacher';
+        let recognition = null;
 
-  <!-- Quick tips for college students -->
-  <div id="quick-tip" role="region" aria-live="polite"></div>
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+        }
 
-  <div id="messages"></div>
+        // DOM Elements
+        const messagesEl = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const quickTipEl = document.getElementById('quickTip');
+        const chatPersonality = document.getElementById('chatPersonality');
+        const personalityDesc = document.getElementById('personalityDesc');
+        const personalityItems = document.querySelectorAll('.personality-item');
 
-  <form id="input-form">
-    <button type="button" id="voice-btn" title="Toggle voice">🎤</button>
-    <textarea id="input-message" placeholder="Type your message..." rows="1" autocomplete="off" required></textarea>
-    <button type="submit" aria-label="Send message">➡️</button>
-  </form>
-</div>
+        // Switch personality
+        personalityItems.forEach(item => {
+            item.addEventListener('click', function() {
+                personalityItems.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                
+                const personality = this.dataset.personality;
+                currentPersonality = personality;
+                
+                // Update UI
+                chatPersonality.textContent = `Chat with ${personalities[personality].name}`;
+                personalityDesc.textContent = personalities[personality].desc;
+                quickTipEl.innerHTML = `<i class="fas fa-lightbulb" style="color: #667eea;"></i> <span>💡 ${personalities[personality].tip}</span>`;
+                
+                // Add bot message
+                addMessage(`Hello! I'm your AI ${personalities[personality].name}. ${personalities[personality].responses.hello}`, 'bot');
+            });
+        });
 
-<script>
-  const inputForm = document.getElementById('input-form');
-  const inputMessage = document.getElementById('input-message');
-  const messagesEl = document.getElementById('messages');
-  const voiceBtn = document.getElementById('voice-btn');
-  const professionalSelect = document.getElementById('professional-select');
-  const quickTipEl = document.getElementById('quick-tip');
+        // Send message
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+            
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        professional: currentPersonality
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add bot response
+                let reply = data.reply;
+                if (!reply) {
+                    const personalityData = personalities[currentPersonality];
+                    let found = false;
+                    for (let key in personalityData.responses) {
+                        if (message.toLowerCase().includes(key)) {
+                            reply = personalityData.responses[key];
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) reply = personalityData.responses.default;
+                }
+                
+                addMessage(reply, 'bot');
+                
+                // Text-to-speech
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(reply);
+                    utterance.lang = 'en-US';
+                    speechSynthesis.speak(utterance);
+                }
+            } catch (error) {
+                typingIndicator.remove();
+                addMessage("I'm here to help! Can you please rephrase that?", 'bot');
+            }
+        }
 
-  const userAvatar = 'https://i.pravatar.cc/40?img=5';
-  const botAvatar = 'https://robohash.org/chatbot.png?size=40x40';
+        // Add message to chat
+        function addMessage(text, sender) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message ${sender}`;
+            
+            if (sender === 'bot') {
+                const avatar = document.createElement('img');
+                avatar.src = 'https://ui-avatars.com/api/?name=AI&background=667eea&color=fff';
+                avatar.className = 'avatar';
+                wrapper.appendChild(avatar);
+            }
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+            wrapper.appendChild(bubble);
+            
+            if (sender === 'user') {
+                const avatar = document.createElement('img');
+                avatar.src = 'https://ui-avatars.com/api/?name=You&background=764ba2&color=fff';
+                avatar.className = 'avatar';
+                wrapper.appendChild(avatar);
+            }
+            
+            messagesEl.appendChild(wrapper);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
 
-  // Store chat histories for each professional separately
-  const chatHistories = {
-    teacher: [],
-    counselor: [],
-    friend: [],
-    other: [],
-  };
+        // Show typing indicator
+        function showTypingIndicator() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message bot';
+            
+            const avatar = document.createElement('img');
+            avatar.src = 'https://ui-avatars.com/api/?name=AI&background=667eea&color=fff';
+            avatar.className = 'avatar';
+            wrapper.appendChild(avatar);
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'typing-indicator';
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'typing-dot';
+                bubble.appendChild(dot);
+            }
+            wrapper.appendChild(bubble);
+            
+            messagesEl.appendChild(wrapper);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            
+            return wrapper;
+        }
 
-  // College student tips mapped to professionals
-  const quickTips = {
-    teacher: "💡 Study Tip: Break your study sessions into focused 25-minute intervals with 5-minute breaks (Pomodoro Technique).",
-    counselor: "🌿 Mental Health Tip: Remember to take deep breaths and reach out if you feel overwhelmed. Your campus counseling center is here to help!",
-  };
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
 
-  // Escape HTML to prevent injection (if needed in future)
-  function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
+        // Voice input
+        if (recognition) {
+            recognition.addEventListener('result', (e) => {
+                const transcript = e.results[0][0].transcript;
+                messageInput.value = transcript;
+                messageInput.style.height = 'auto';
+                messageInput.style.height = (messageInput.scrollHeight) + 'px';
+            });
 
-  // Render messages of the currently selected professional
-  function renderMessages(professional) {
-    messagesEl.innerHTML = '';
-    const history = chatHistories[professional] || [];
-    for (const msg of history) {
-      addMessage(msg.text, msg.sender, false);
-    }
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+            recognition.addEventListener('end', () => {
+                voiceBtn.classList.remove('active');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            });
 
-    // Show or hide quick tip based on selected professional
-    if (quickTips[professional]) {
-      quickTipEl.textContent = quickTips[professional];
-      quickTipEl.style.display = 'block';
-    } else {
-      quickTipEl.textContent = '';
-      quickTipEl.style.display = 'none';
-    }
-  }
-
-  // Add message to UI and optionally save it to history
-  function addMessage(text, sender, saveToHistory = true) {
-    const wrapper = document.createElement('div');
-    wrapper.className = `message ${sender}`;
-
-    const avatar = document.createElement('img');
-    avatar.src = sender === 'user' ? userAvatar : botAvatar;
-    avatar.className = 'avatar';
-    avatar.alt = sender === 'user' ? 'User avatar' : 'Bot avatar';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-
-    if (sender === 'user') {
-      wrapper.append(bubble, avatar);
-    } else {
-      wrapper.append(avatar, bubble);
-    }
-
-    messagesEl.appendChild(wrapper);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-
-    if (saveToHistory) {
-      const professional = professionalSelect.value;
-      chatHistories[professional].push({ text, sender });
-    }
-  }
-
-  async function sendMessage(message) {
-    const professional = professionalSelect.value;
-    addMessage(message, 'user');  // Add user message
-
-    inputMessage.value = '';
-    inputMessage.disabled = true;
-
-    try {
-      // Send professional info along with message to backend
-      const response = await fetch('/api/chat/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, professional }),
-      });
-
-      const data = await response.json();
-      const reply = data.reply || "No response from AI.";
-      addMessage(reply, 'bot');  // Add bot reply
-
-      // Voice output
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(reply);
-        utterance.lang = 'en-US';
-        speechSynthesis.speak(utterance);
-      }
-    } catch (err) {
-      addMessage("Error: Unable to get response.", 'bot');
-    } finally {
-      inputMessage.disabled = false;
-      inputMessage.focus();
-    }
-  }
-
-  inputForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const message = inputMessage.value.trim();
-    if (!message) return;
-    sendMessage(message);
-  });
-
-  // Voice recognition (Speech-to-Text)
-  let recognition;
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.addEventListener('result', (e) => {
-      const transcript = e.results[0][0].transcript;
-      inputMessage.value = transcript;
-      inputMessage.focus();
-    });
-
-    recognition.addEventListener('end', () => {
-      voiceBtn.classList.remove('active');
-    });
-  } else {
-    voiceBtn.disabled = true;
-    voiceBtn.title = 'Speech recognition not supported';
-  }
-
-  voiceBtn.addEventListener('click', () => {
-    if (!recognition) return;
-    if (voiceBtn.classList.contains('active')) {
-      recognition.stop();
-      voiceBtn.classList.remove('active');
-    } else {
-      recognition.start();
-      voiceBtn.classList.add('active');
-    }
-  });
-
-  // When professional selection changes, render corresponding chat history and quick tip
-  professionalSelect.addEventListener('change', () => {
-    renderMessages(professionalSelect.value);
-    inputMessage.focus();
-  });
-
-  // Initialize with teacher selected
-  renderMessages(professionalSelect.value);
-  inputMessage.focus();
-
-</script>
+            voiceBtn.addEventListener('click', () => {
+                if (voiceBtn.classList.contains('active')) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                    voiceBtn.classList.add('active');
+                    voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                }
+            });
+        } else {
+            voiceBtn.style.opacity = '0.5';
+            voiceBtn.title = 'Speech recognition not supported in this browser';
+        }
+    </script>
 </body>
 </html>
